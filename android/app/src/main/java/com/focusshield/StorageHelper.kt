@@ -3,7 +3,8 @@ package com.focusshield
 import android.content.Context
 
 object StorageHelper {
-
+private const val BLOCKED_APP_NAMES_KEY =
+    "blocked_app_names"
     private const val PREF_NAME =
         "focus_shield_prefs"
 
@@ -87,6 +88,7 @@ private const val SESSION_END_KEY =
         )
         .edit()
         .remove(BLOCKED_APPS_KEY)
+        .remove(BLOCKED_APP_NAMES_KEY)
         .remove(SESSION_END_KEY)
         .apply()
 }
@@ -102,5 +104,38 @@ fun getRemainingTime(
         0,
         endTime - System.currentTimeMillis()
     )
+}
+
+fun saveBlockedAppNames(
+    context: Context,
+    appNames: String
+) {
+
+    context
+        .getSharedPreferences(
+            PREF_NAME,
+            Context.MODE_PRIVATE
+        )
+        .edit()
+        .putString(
+            BLOCKED_APP_NAMES_KEY,
+            appNames
+        )
+        .apply()
+}
+
+fun getBlockedAppNames(
+    context: Context
+): String {
+
+    return context
+        .getSharedPreferences(
+            PREF_NAME,
+            Context.MODE_PRIVATE
+        )
+        .getString(
+            BLOCKED_APP_NAMES_KEY,
+            ""
+        ) ?: ""
 }
 }

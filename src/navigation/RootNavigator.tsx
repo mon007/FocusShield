@@ -26,6 +26,10 @@ export default function RootNavigator() {
 <Stack.Screen
   name="Focus"
   component={FocusScreen}
+  options={{
+    headerBackVisible: false,
+    gestureEnabled: false,
+  }}
 />
        
       </Stack.Navigator>

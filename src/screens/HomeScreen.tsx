@@ -14,7 +14,7 @@ import AppCard from '../components/AppCard';
 import DurationChip from '../components/DurationChip';
 import {RootStackParamList} from '../navigation/types';
 import FocusBlocker from '../native/FocusBlocker';
-
+import {getSession} from '../storage/storage';
 type Props = NativeStackScreenProps<
   RootStackParamList,
   'Home'
@@ -27,6 +27,10 @@ export default function HomeScreen({
 }: Props) {
  const [apps, setApps] = useState<any[]>([]);
   const [duration, setDuration] = useState(60);
+  const [
+  accessibilityEnabled,
+  setAccessibilityEnabled,
+] = useState(true);
 const testNativeModule = async () => {
   try {
     const deviceName =
@@ -58,7 +62,17 @@ useEffect(() => {
   loadInstalledApps();
 }, []);
 
+const checkAccessibility =
+  async () => {
 
+    const enabled =
+      await FocusBlocker
+        .isAccessibilityEnabled();
+
+    setAccessibilityEnabled(
+      enabled,
+    );
+  };
 
 // actual call of loaded apps from native module
 
@@ -84,6 +98,7 @@ const formattedApps =
 
 useEffect(() => {
   loadApps();
+   checkAccessibility();
 }, []);
 
 
@@ -103,10 +118,28 @@ const toggleApp = (packageName: string) => {
 };
 
 const startFocus = async () => {
+  const enabled =
+  await FocusBlocker
+    .isAccessibilityEnabled();
+
+if (!enabled) {
+  Alert.alert(
+    'Accessibility Required',
+    'Focus Shield cannot block apps until Accessibility Service is enabled.',
+  );
+
+  return;
+}
 const selectedApps = apps
   .filter(app => app.selected)
   .map(app => app.packageName);
+const selectedAppNamesArray =
+  apps
+    .filter(app => app.selected)
+    .map(app => app.name);
 
+const selectedAppNames =
+  selectedAppNamesArray.join(', ');
   if (!selectedApps.length) {
     Alert.alert(
       'No Apps Selected',
@@ -118,11 +151,14 @@ const selectedApps = apps
   const endTime =
     Date.now() + duration * 60 * 1000;
 
-  await saveSession({
-    endTime,
-    duration,
-    apps: selectedApps,
-  });
+await saveSession({
+  active: true,
+  endTime,
+  duration,
+
+  apps: selectedApps,
+  appNames: selectedAppNamesArray,
+});
   await FocusBlocker.saveBlockedApps(
   selectedApps,
 );
@@ -130,16 +166,63 @@ await FocusBlocker.saveSessionEndTime(
   endTime,
 );
 await FocusBlocker
+  .saveBlockedAppNames(
+    selectedAppNames,
+  );
+await FocusBlocker
   .startForegroundService();
-navigation.navigate('Focus');
+navigation.replace('Focus');
 };
+useEffect(() => {
+  checkActiveSession();
+}, []);
 
+const checkActiveSession =
+  async () => {
+    const session =
+      await getSession();
+
+    if (!session) {
+      return;
+    }
+
+    if (
+      session.endTime >
+      Date.now()
+    ) {
+      navigation.replace(
+        'Focus',
+      );
+    }
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
         Focus Shield
       </Text>
+{!accessibilityEnabled && (
+  <TouchableOpacity
+    style={styles.warningBanner}
+    onPress={() =>
+      FocusBlocker.openAccessibilitySettings()
+    }>
+    
+    <Text style={styles.warningTitle}>
+      ⚠ Protection Disabled
+    </Text>
 
+    <Text style={styles.warningDescription}>
+      Accessibility Service is OFF.
+      Focus Shield cannot block apps
+      until it is enabled.
+    </Text>
+
+    <Text style={styles.warningAction}>
+      Tap to Enable
+    </Text>
+
+  </TouchableOpacity>
+)}
       <Text style={styles.heading}>
         Select Apps
       </Text>
@@ -164,6 +247,13 @@ navigation.navigate('Focus');
       </Text>
 
       <View style={styles.durationRow}>
+          <DurationChip
+          label="1m"
+          active={duration === 1}
+          onPress={() =>
+            setDuration(1)
+          }
+        />
         <DurationChip
           label="30m"
           active={duration === 30}
@@ -243,4 +333,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
+  warningBanner: {
+  backgroundColor: '#FFE8A3',
+  padding: 12,
+  borderRadius: 12,
+  marginBottom: 16,
+},
+
+warningText: {
+  fontWeight: '600',
+},
+warningTitle: {
+  fontSize: 16,
+  fontWeight: '700',
+  marginBottom: 4,
+},
+
+warningDescription: {
+  fontSize: 14,
+  lineHeight: 20,
+},
+
+warningAction: {
+  marginTop: 8,
+  fontWeight: '700',
+},
 });

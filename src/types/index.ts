@@ -9,14 +9,14 @@ export interface FocusSession {
   active: boolean;
   duration: number;
   endTime: number;
+
+  apps: string[];
+  appNames: string[];
 }
 export type RootStackParamList = {
   Home: undefined;
 
-  Focus: {
-    duration: number;
-    apps: string[];
-  };
+  Focus: undefined;
 };
 export interface InstalledApp {
   name: string;

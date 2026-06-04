@@ -9,7 +9,8 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import android.content.Intent
 import com.facebook.react.bridge.ReadableArray
-
+import android.provider.Settings
+import android.text.TextUtils
 
 class FocusBlockerModule(
     reactContext: ReactApplicationContext
@@ -221,6 +222,139 @@ fun stopForegroundService(
 
         promise.reject(
             "SERVICE_STOP_ERROR",
+            e.message
+        )
+    }
+}
+
+@ReactMethod
+fun saveBlockedAppNames(
+    names: String,
+    promise: Promise
+) {
+
+    try {
+
+        StorageHelper
+            .saveBlockedAppNames(
+                reactApplicationContext,
+                names
+            )
+
+        promise.resolve(true)
+
+    } catch (e: Exception) {
+
+        promise.reject(
+            "SAVE_APP_NAMES_ERROR",
+            e.message
+        )
+    }
+}
+@ReactMethod
+fun isAccessibilityEnabled(
+    promise: Promise
+) {
+
+    try {
+
+        val service =
+            "${reactApplicationContext.packageName}/" +
+            "com.focusshield.FocusAccessibilityService"
+
+        var accessibilityEnabled = 0
+
+        try {
+
+            accessibilityEnabled =
+                Settings.Secure.getInt(
+                    reactApplicationContext
+                        .contentResolver,
+                    Settings.Secure
+                        .ACCESSIBILITY_ENABLED
+                )
+
+        } catch (
+            e: Settings.SettingNotFoundException
+        ) {
+        }
+
+        if (accessibilityEnabled == 1) {
+
+            val settingValue =
+                Settings.Secure.getString(
+                    reactApplicationContext
+                        .contentResolver,
+                    Settings.Secure
+                        .ENABLED_ACCESSIBILITY_SERVICES
+                )
+
+            if (settingValue != null) {
+
+                val splitter =
+                    TextUtils.SimpleStringSplitter(':')
+
+                splitter.setString(
+                    settingValue
+                )
+
+                while (
+                    splitter.hasNext()
+                ) {
+
+                    val accessibilityService =
+                        splitter.next()
+
+                    if (
+                        accessibilityService.equals(
+                            service,
+                            ignoreCase = true
+                        )
+                    ) {
+
+                        promise.resolve(true)
+                        return
+                    }
+                }
+            }
+        }
+
+        promise.resolve(false)
+
+    } catch (e: Exception) {
+
+        promise.reject(
+            "ACCESSIBILITY_CHECK_ERROR",
+            e.message
+        )
+    }
+}
+@ReactMethod
+fun openAccessibilitySettings(
+    promise: Promise
+) {
+
+    try {
+
+        val intent =
+            Intent(
+                Settings
+                    .ACTION_ACCESSIBILITY_SETTINGS
+            )
+
+        intent.addFlags(
+            Intent.FLAG_ACTIVITY_NEW_TASK
+        )
+
+        reactApplicationContext
+            .startActivity(intent)
+
+        promise.resolve(true)
+
+    } catch (e: Exception) {
+
+        promise.reject(
+            "SETTINGS_ERROR",
             e.message
         )
     }

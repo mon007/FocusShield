@@ -1,15 +1,23 @@
-import React, {useEffect, useState} from 'react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  BackHandler,
 } from 'react-native';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+
 import {RootStackParamList} from '../navigation/types';
+
 import FocusBlocker from '../native/FocusBlocker';
+
 import {
   getSession,
   clearSession,
@@ -28,29 +36,29 @@ export default function FocusScreen({
 
   const [blockedApps, setBlockedApps] =
     useState<string[]>([]);
+useEffect(() => {
+  const backAction = () => {
+    return true;
+  };
 
+  const subscription =
+    BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+  return () =>
+    subscription.remove();
+}, []);
   useEffect(() => {
     loadSession();
-  }, []);
-
-  useEffect(() => {
-    if (secondsLeft <= 0) {
-      return;
-    }
 
     const interval = setInterval(() => {
-      setSecondsLeft(prev => {
-        if (prev <= 1) {
-          handleSessionComplete();
-          return 0;
-        }
-
-        return prev - 1;
-      });
+      updateRemainingTime();
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [secondsLeft]);
+  }, []);
 
   const goHome = () => {
     navigation.reset({
@@ -67,40 +75,75 @@ export default function FocusScreen({
       return;
     }
 
-    setBlockedApps(session.apps);
+    setBlockedApps(
+  session.appNames ??
+    session.apps,
+);
 
-    const remaining = Math.floor(
-      (session.endTime - Date.now()) / 1000,
+    const remaining = Math.max(
+      0,
+      Math.floor(
+        (session.endTime -
+          Date.now()) /
+          1000,
+      ),
     );
 
     if (remaining <= 0) {
-      await clearSession();
-      goHome();
+      await handleSessionComplete();
       return;
     }
 
     setSecondsLeft(remaining);
   };
 
-const handleSessionComplete =
-  async () => {
-    await clearSession();
-await FocusBlocker
-  .stopForegroundService();
-    await FocusBlocker.clearFocusSession();
+  const updateRemainingTime =
+    async () => {
+      const session =
+        await getSession();
 
-    goHome();
-  };
+      if (!session) {
+        return;
+      }
 
- const stopSession = async () => {
-  await clearSession();
-  await FocusBlocker
-  .stopForegroundService();
+      const remaining = Math.max(
+        0,
+        Math.floor(
+          (session.endTime -
+            Date.now()) /
+            1000,
+        ),
+      );
 
-  await FocusBlocker.clearFocusSession();
+      if (remaining <= 0) {
+        await handleSessionComplete();
+        return;
+      }
 
-  goHome();
-};
+      setSecondsLeft(remaining);
+    };
+
+  const handleSessionComplete =
+    async () => {
+      await clearSession();
+
+      await FocusBlocker.stopForegroundService();
+
+      await FocusBlocker.clearFocusSession();
+
+      goHome();
+    };
+
+  const stopSession =
+    async () => {
+      await clearSession();
+
+      await FocusBlocker.stopForegroundService();
+
+      await FocusBlocker.clearFocusSession();
+
+      goHome();
+    };
 
   const formatTime = (
     totalSeconds: number,
@@ -139,7 +182,8 @@ await FocusBlocker
       </Text>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>
+        <Text
+          style={styles.sectionTitle}>
           Blocked Apps
         </Text>
 
@@ -147,8 +191,10 @@ await FocusBlocker
           data={blockedApps}
           keyExtractor={item => item}
           renderItem={({item}) => (
-            <View style={styles.appItem}>
-              <Text style={styles.appText}>
+            <View
+              style={styles.appItem}>
+              <Text
+                style={styles.appText}>
                 • {item}
               </Text>
             </View>
@@ -160,7 +206,10 @@ await FocusBlocker
         <TouchableOpacity
           style={styles.stopButton}
           onPress={stopSession}>
-          <Text style={styles.stopButtonText}>
+          <Text
+            style={
+              styles.stopButtonText
+            }>
             STOP SESSION
           </Text>
         </TouchableOpacity>

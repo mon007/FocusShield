@@ -37,4 +37,21 @@ stopForegroundService() {
   return FocusBlocker
     .stopForegroundService();
 },
+saveBlockedAppNames(
+  names: string,
+) {
+  return FocusBlocker
+    .saveBlockedAppNames(
+      names,
+    );
+},
+isAccessibilityEnabled() {
+  return FocusBlocker
+    .isAccessibilityEnabled();
+},
+
+openAccessibilitySettings() {
+  return FocusBlocker
+    .openAccessibilitySettings();
+},
 };
