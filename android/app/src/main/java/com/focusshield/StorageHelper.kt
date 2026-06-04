@@ -75,7 +75,7 @@ private const val SESSION_END_KEY =
                 emptySet()
             ) ?: emptySet()
     }
-    
+
     fun clearSession(
     context: Context
 ) {
@@ -89,5 +89,18 @@ private const val SESSION_END_KEY =
         .remove(BLOCKED_APPS_KEY)
         .remove(SESSION_END_KEY)
         .apply()
+}
+
+fun getRemainingTime(
+    context: Context
+): Long {
+
+    val endTime =
+        getSessionEndTime(context)
+
+    return maxOf(
+        0,
+        endTime - System.currentTimeMillis()
+    )
 }
 }

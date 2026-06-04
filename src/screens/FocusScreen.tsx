@@ -85,7 +85,8 @@ export default function FocusScreen({
 const handleSessionComplete =
   async () => {
     await clearSession();
-
+await FocusBlocker
+  .stopForegroundService();
     await FocusBlocker.clearFocusSession();
 
     goHome();
@@ -93,6 +94,8 @@ const handleSessionComplete =
 
  const stopSession = async () => {
   await clearSession();
+  await FocusBlocker
+  .stopForegroundService();
 
   await FocusBlocker.clearFocusSession();
 

@@ -27,4 +27,14 @@ saveSessionEndTime(
 clearFocusSession() {
   return FocusBlocker.clearFocusSession();
 },
+
+startForegroundService() {
+  return FocusBlocker
+    .startForegroundService();
+},
+
+stopForegroundService() {
+  return FocusBlocker
+    .stopForegroundService();
+},
 };

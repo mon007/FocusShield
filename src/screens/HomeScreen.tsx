@@ -129,6 +129,8 @@ const selectedApps = apps
 await FocusBlocker.saveSessionEndTime(
   endTime,
 );
+await FocusBlocker
+  .startForegroundService();
 navigation.navigate('Focus');
 };
 

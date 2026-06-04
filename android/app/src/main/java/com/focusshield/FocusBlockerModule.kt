@@ -10,6 +10,7 @@ import com.facebook.react.bridge.ReactMethod
 import android.content.Intent
 import com.facebook.react.bridge.ReadableArray
 
+
 class FocusBlockerModule(
     reactContext: ReactApplicationContext
 ) : ReactContextBaseJavaModule(reactContext) {
@@ -162,6 +163,64 @@ fun clearFocusSession(
 
         promise.reject(
             "CLEAR_SESSION_ERROR",
+            e.message
+        )
+    }
+}
+
+@ReactMethod
+fun startForegroundService(
+    promise: Promise
+) {
+
+    try {
+
+        val intent =
+            Intent(
+                reactApplicationContext,
+                FocusForegroundService::class.java
+            )
+
+        reactApplicationContext
+            .startForegroundService(
+                intent
+            )
+
+        promise.resolve(true)
+
+    } catch (e: Exception) {
+
+        promise.reject(
+            "SERVICE_START_ERROR",
+            e.message
+        )
+    }
+}
+
+@ReactMethod
+fun stopForegroundService(
+    promise: Promise
+) {
+
+    try {
+
+        val intent =
+            Intent(
+                reactApplicationContext,
+                FocusForegroundService::class.java
+            )
+
+        reactApplicationContext
+            .stopService(
+                intent
+            )
+
+        promise.resolve(true)
+
+    } catch (e: Exception) {
+
+        promise.reject(
+            "SERVICE_STOP_ERROR",
             e.message
         )
     }
