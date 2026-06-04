@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
+import { Colors } from '../theme/colors';
 
 type Props = {
   label: string;
@@ -31,13 +32,15 @@ export default function DurationChip({
 const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingHorizontal:16,
+    paddingVertical: 8,
     borderRadius: 20,
     marginRight: 10,
+    marginTop:10
   },
 
   active: {
     borderWidth: 2,
+    borderColor: Colors.primary,
   },
 });

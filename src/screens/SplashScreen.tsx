@@ -9,6 +9,9 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../navigation/types';
 
 import {getSession} from '../storage/storage';
+import {
+  hasCompletedOnboarding,
+} from '../storage/storage';
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
@@ -22,18 +25,34 @@ export default function SplashScreen({
     checkSession();
   }, []);
 
-  const checkSession = async () => {
-    const session = await getSession();
+ const checkSession = async () => {
+  const session =
+    await getSession();
 
-   if (
-  session &&
-  session.endTime > Date.now()
-) {
-  navigation.replace('Focus');
-} else {
-  navigation.replace('Home');
-}
-  };
+  if (
+    session &&
+    session.endTime > Date.now()
+  ) {
+    navigation.replace(
+      'Focus',
+    );
+
+    return;
+  }
+
+  const completed =
+    await hasCompletedOnboarding();
+
+  if (completed) {
+    navigation.replace(
+      'Home',
+    );
+  } else {
+    navigation.replace(
+      'Onboarding',
+    );
+  }
+};
 
   return (
     <View

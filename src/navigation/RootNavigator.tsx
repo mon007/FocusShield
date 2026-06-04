@@ -5,6 +5,7 @@ import SplashScreen from '../screens/SplashScreen';
 import HomeScreen from '../screens/HomeScreen';
 import FocusScreen from '../screens/FocusScreen';
 import { RootStackParamList } from '../types';
+import OnboardingScreen from '../screens/OnboardingScreens';
 
 // const Stack = createNativeStackNavigator();
 const Stack =
@@ -21,6 +22,11 @@ export default function RootNavigator() {
 <Stack.Screen
   name="Home"
   component={HomeScreen}
+ options={{
+  headerShown: false,
+ }
+  
+ }
 />
 
 <Stack.Screen
@@ -30,6 +36,10 @@ export default function RootNavigator() {
     headerBackVisible: false,
     gestureEnabled: false,
   }}
+/>
+<Stack.Screen
+  name="Onboarding"
+  component={OnboardingScreen}
 />
        
       </Stack.Navigator>

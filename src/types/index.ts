@@ -15,11 +15,15 @@ export interface FocusSession {
 }
 export type RootStackParamList = {
   Home: undefined;
-
   Focus: undefined;
+  Onboarding: undefined;
 };
 export interface InstalledApp {
   name: string;
   packageName: string;
   selected?: boolean;
+}
+export interface FocusListApp {
+  name: string;
+  packageName: string;
 }
