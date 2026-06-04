@@ -9,7 +9,7 @@ import {
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../navigation/types';
-
+import FocusBlocker from '../native/FocusBlocker';
 import {
   getSession,
   clearSession,
@@ -82,16 +82,22 @@ export default function FocusScreen({
     setSecondsLeft(remaining);
   };
 
-  const handleSessionComplete =
-    async () => {
-      await clearSession();
-      goHome();
-    };
-
-  const stopSession = async () => {
+const handleSessionComplete =
+  async () => {
     await clearSession();
+
+    await FocusBlocker.clearFocusSession();
+
     goHome();
   };
+
+ const stopSession = async () => {
+  await clearSession();
+
+  await FocusBlocker.clearFocusSession();
+
+  goHome();
+};
 
   const formatTime = (
     totalSeconds: number,

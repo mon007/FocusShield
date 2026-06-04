@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -13,62 +13,99 @@ import {saveSession} from '../storage/storage';
 import AppCard from '../components/AppCard';
 import DurationChip from '../components/DurationChip';
 import {RootStackParamList} from '../navigation/types';
+import FocusBlocker from '../native/FocusBlocker';
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
   'Home'
 >;
 
-const INITIAL_APPS = [
-  {
-    id: '1',
-    name: 'Instagram',
-    packageName: 'com.instagram.android',
-    selected: false,
-  },
-  {
-    id: '2',
-    name: 'YouTube',
-    packageName: 'com.google.android.youtube',
-    selected: false,
-  },
-  {
-    id: '3',
-    name: 'Facebook',
-    packageName: 'com.facebook.katana',
-    selected: false,
-  },
-  {
-    id: '4',
-    name: 'X',
-    packageName: 'com.twitter.android',
-    selected: false,
-  },
-];
+
 
 export default function HomeScreen({
   navigation,
 }: Props) {
-  const [apps, setApps] = useState(INITIAL_APPS);
+ const [apps, setApps] = useState<any[]>([]);
   const [duration, setDuration] = useState(60);
+const testNativeModule = async () => {
+  try {
+    const deviceName =
+      await FocusBlocker.getDeviceName();
 
-  const toggleApp = (id: string) => {
-    setApps(prev =>
-      prev.map(app =>
-        app.id === id
-          ? {
-              ...app,
-              selected: !app.selected,
-            }
-          : app,
-      ),
+    console.log(
+      'Device Name:',
+      deviceName,
     );
-  };
+  } catch (e) {
+    console.log(e);
+  }
+};
+const loadInstalledApps = async () => {
+  try {
+    const apps =
+      await FocusBlocker.getInstalledApps();
+
+    console.log(
+      'Installed Apps:',
+      apps,
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+useEffect(() => {
+  testNativeModule();
+  loadInstalledApps();
+}, []);
+
+
+
+// actual call of loaded apps from native module
+
+const loadApps = async () => {
+  try {
+    const installedApps =
+      await FocusBlocker.getInstalledApps();
+
+const formattedApps =
+  installedApps
+    .map((app: any) => ({
+      ...app,
+      selected: false,
+    }))
+    .sort((a: any, b: any) =>
+      a.name.localeCompare(b.name),
+    );
+    setApps(formattedApps);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+useEffect(() => {
+  loadApps();
+}, []);
+
+
+
+
+const toggleApp = (packageName: string) => {
+  setApps(prev =>
+    prev.map(app =>
+      app.packageName === packageName
+        ? {
+            ...app,
+            selected: !app.selected,
+          }
+        : app,
+    ),
+  );
+};
 
 const startFocus = async () => {
-  const selectedApps = apps
-    .filter(app => app.selected)
-    .map(app => app.name);
+const selectedApps = apps
+  .filter(app => app.selected)
+  .map(app => app.packageName);
 
   if (!selectedApps.length) {
     Alert.alert(
@@ -86,6 +123,12 @@ const startFocus = async () => {
     duration,
     apps: selectedApps,
   });
+  await FocusBlocker.saveBlockedApps(
+  selectedApps,
+);
+await FocusBlocker.saveSessionEndTime(
+  endTime,
+);
 navigation.navigate('Focus');
 };
 
@@ -101,15 +144,15 @@ navigation.navigate('Focus');
 
       <FlatList
         data={apps}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.packageName}
         renderItem={({item}) => (
           <AppCard
-            name={item.name}
-            selected={item.selected}
-            onPress={() =>
-              toggleApp(item.id)
-            }
-          />
+      name={item.name}
+      selected={item.selected}
+      onPress={() =>
+        toggleApp(item.packageName)
+      }
+    />
         )}
         style={styles.list}
       />

@@ -18,3 +18,8 @@ export type RootStackParamList = {
     apps: string[];
   };
 };
+export interface InstalledApp {
+  name: string;
+  packageName: string;
+  selected?: boolean;
+}
