@@ -268,13 +268,14 @@ title: {
   marginTop: 32,
   fontSize: 24,
   fontWeight: '700',
-  color: Colors.primary,
+  color: "#2E7D32",
 },
 
 subtitle: {
   marginTop: 6,
-  color: '#666',
-  fontSize: 15,
+  color: '#111',
+  fontSize: 14,
+  fontWeight: '500',
 },
 
 listContainer: {

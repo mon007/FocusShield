@@ -371,7 +371,7 @@ export default function HomeScreen({
             <View style={styles.durationCard}>
 
               <Text style={styles.durationTitle}>
-                Focus Duration
+               Focus Duration
               </Text>
 
               <View style={styles.durationRow}>
