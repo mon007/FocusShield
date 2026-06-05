@@ -24,7 +24,13 @@ export default function DurationChip({
         active && styles.active,
       ]}
       onPress={onPress}>
-      <Text>{label}</Text>
+    <Text
+  style={[
+    styles.text,
+    active && styles.activeText,
+  ]}>
+  {label}
+</Text>
     </TouchableOpacity>
   );
 }
@@ -32,15 +38,37 @@ export default function DurationChip({
 const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
-    paddingHorizontal:16,
-    paddingVertical: 8,
+    borderColor: '#E5E7EB',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
     borderRadius: 20,
     marginRight: 10,
-    marginTop:10
+    marginTop: 10,
+    backgroundColor: '#FFF',
   },
 
-  active: {
-    borderWidth: 2,
-    borderColor: Colors.primary,
+active: {
+  backgroundColor: Colors.primary,
+  borderColor: Colors.primary,
+
+  shadowColor: Colors.primary,
+  shadowOpacity: 0.25,
+  shadowRadius: 8,
+  shadowOffset: {
+    width: 0,
+    height: 4,
+  },
+
+  elevation: 4,
+},
+
+  text: {
+    color: Colors.text,
+    fontWeight: '500',
+  },
+
+  activeText: {
+    color: '#FFF',
+    fontWeight: '600',
   },
 });

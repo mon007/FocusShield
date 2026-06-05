@@ -65,9 +65,9 @@ export default function AppCard({
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 18,
-    paddingHorizontal: 16,
-    backgroundColor: Colors.primaryLight,
-    borderRadius: 12
+   // paddingHorizontal: 16,
+    // backgroundColor: Colors.primaryLight,
+    // borderRadius: 12
   },
 
 

@@ -17,6 +17,11 @@ export default function RootNavigator() {
         <Stack.Screen
           name="Splash"
   component={SplashScreen}
+   options={{
+  headerShown: false,
+ }
+  
+ }
 />
 
 <Stack.Screen
@@ -41,6 +46,9 @@ export default function RootNavigator() {
 <Stack.Screen
   name="Onboarding"
   component={OnboardingScreen}
+   options={{
+  headerShown: false,
+ }}
 />
        
       </Stack.Navigator>
