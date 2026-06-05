@@ -35,6 +35,7 @@ export default function RootNavigator() {
   options={{
     headerBackVisible: false,
     gestureEnabled: false,
+      headerShown: false,
   }}
 />
 <Stack.Screen

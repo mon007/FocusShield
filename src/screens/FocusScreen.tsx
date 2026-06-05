@@ -10,8 +10,9 @@ import {
   FlatList,
   TouchableOpacity,
   BackHandler,
+  Image
 } from 'react-native';
-
+import {SafeAreaView} from 'react-native-safe-area-context';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import {RootStackParamList} from '../navigation/types';
@@ -22,6 +23,7 @@ import {
   getSession,
   clearSession,
 } from '../storage/storage';
+import { Colors } from '../theme/colors';
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
@@ -34,8 +36,8 @@ export default function FocusScreen({
   const [secondsLeft, setSecondsLeft] =
     useState(0);
 
-  const [blockedApps, setBlockedApps] =
-    useState<string[]>([]);
+ const [blockedApps, setBlockedApps] =
+  useState<any[]>([]);
 useEffect(() => {
   const backAction = () => {
     return true;
@@ -70,14 +72,14 @@ useEffect(() => {
   const loadSession = async () => {
     const session = await getSession();
 
+
     if (!session) {
       goHome();
       return;
     }
 
-    setBlockedApps(
-  session.appNames ??
-    session.apps,
+ setBlockedApps(
+  session.blockedApps ?? [],
 );
 
     const remaining = Math.max(
@@ -172,107 +174,147 @@ useEffect(() => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
-        Focus Active
-      </Text>
+  <SafeAreaView
+  style={styles.container}>
 
-      <Text style={styles.timer}>
-        {formatTime(secondsLeft)}
-      </Text>
+  <View
+    style={styles.header}>
 
-      <View style={styles.section}>
-        <Text
-          style={styles.sectionTitle}>
-          Blocked Apps
-        </Text>
+    <Text
+      style={styles.timer}>
+      {formatTime(secondsLeft)}
+    </Text>
 
-        <FlatList
-          data={blockedApps}
-          keyExtractor={item => item}
-          renderItem={({item}) => (
-            <View
-              style={styles.appItem}>
-              <Text
-                style={styles.appText}>
-                • {item}
-              </Text>
-            </View>
-          )}
-        />
-      </View>
+    <Text
+      style={styles.remaining}>
+      remaining
+    </Text>
 
-      <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.stopButton}
-          onPress={stopSession}>
-          <Text
-            style={
-              styles.stopButtonText
-            }>
-            STOP SESSION
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <Text
+      style={styles.title}>
+      Focus Active
+    </Text>
+
+    <Text
+      style={styles.subtitle}>
+      {blockedApps.length} apps protected
+    </Text>
+
+  </View>
+
+  <View style={styles.listContainer}>
+    <FlatList
+      data={blockedApps}
+      keyExtractor={item => item.packageName}
+      renderItem={({item}) => (
+       <View style={styles.appRow}>
+
+  <Image
+    source={{
+      uri: `data:image/png;base64,${item.icon}`,
+    }}
+    style={styles.icon}
+  />
+
+  <Text style={styles.appText}>
+    {item.name}
+  </Text>
+
+</View>
+      )}
+    />
+  </View>
+
+  <TouchableOpacity
+    style={styles.stopButton}
+    onPress={stopSession}>
+    <Text
+      style={styles.stopButtonText}>
+      End Session
+    </Text>
+  </TouchableOpacity>
+
+</SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
 
-  title: {
-    fontSize: 30,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginTop: 20,
-  },
 
-  timer: {
-    fontSize: 48,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginVertical: 30,
-  },
+container: {
+  flex: 1,
+  backgroundColor: '#F8F7F4',
+  paddingHorizontal: 24,
+},
 
-  section: {
-    flex: 1,
-  },
+header: {
+  alignItems: 'center',
+  marginTop: 40,
+},
 
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 16,
-  },
+timer: {
+  fontSize: 64,
+  fontWeight: '700',
+  color: '#111',
+},
 
-  appItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
+remaining: {
+  marginTop: 4,
+  color: '#888',
+  fontSize: 14,
+},
 
-  appText: {
-    fontSize: 18,
-  },
+title: {
+  marginTop: 32,
+  fontSize: 24,
+  fontWeight: '700',
+  color: Colors.primary,
+},
 
-  footer: {
-    paddingBottom: 30,
-  },
+subtitle: {
+  marginTop: 6,
+  color: '#666',
+  fontSize: 15,
+},
 
-  stopButton: {
-    backgroundColor: '#000',
-    paddingVertical: 18,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
+listContainer: {
+  flex: 1,
+  marginTop: 40,
+},
 
-  stopButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-  },
+icon: {
+  width: 32,
+  height: 32,
+  borderRadius: 8,
+  marginRight: 12,
+},
+
+appRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingVertical: 18,
+  borderBottomWidth: 1,
+  borderBottomColor: '#ECECEC',
+},
+
+appText: {
+  fontSize: 16,
+  color: '#111',
+},
+
+stopButton: {
+  height: 58,
+  borderRadius: 16,
+  borderWidth: 1,
+  borderColor: '#EF4444',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginBottom: 24,
+},
+
+stopButtonText: {
+  color: '#EF4444',
+  fontWeight: '600',
+  fontSize: 16,
+},
 });

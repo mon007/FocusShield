@@ -4,61 +4,74 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:gravity="center"
+    android:background="#F8F7F4"
+    android:padding="32dp">
 
     <TextView
+        android:id="@+id/shieldIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Focus Shield"
-        android:textSize="28sp"
-        android:textStyle="bold"/>
+        android:text="🛡"
+        android:textSize="72sp" />
 
     <TextView
+        android:id="@+id/focusTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="🚫"
-        android:textSize="64sp"
-        android:layout_marginTop="24dp"/>
+        android:text="Stay Focused"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="#111111"
+        android:layout_marginTop="16dp" />
 
     <TextView
         android:id="@+id/blockTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="App is blocked"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"/>
+        android:text="Instagram is unavailable until your session ends."
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:gravity="center"
+        android:layout_marginTop="12dp" />
 
     <TextView
         android:id="@+id/timerText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="00:00:00"
-        android:textSize="32sp"
+        android:text="01:42:18"
+        android:textSize="52sp"
         android:textStyle="bold"
-        android:layout_marginTop="20dp"/>
+        android:textColor="#111111"
+        android:layout_marginTop="40dp" />
 
     <TextView
+        android:id="@+id/remainingText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="remaining"
-        android:textSize="16sp"
-        android:layout_marginTop="4dp"/>
+        android:textSize="14sp"
+        android:textColor="#888888"
+        android:layout_marginTop="4dp" />
+
+    <Button
+        android:id="@+id/goBackButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Back to Focus"
+        android:textAllCaps="false"
+        android:textStyle="bold"
+        android:layout_marginTop="48dp"
+        android:backgroundTint="#111111"
+        android:textColor="#FFFFFF" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Stay focused"
-        android:textSize="18sp"
-        android:layout_marginTop="20dp"/>
-
-    <Button
-        android:id="@+id/goBackButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Go Home"
-        android:layout_marginTop="32dp"/>
+        android:text="Focus Shield"
+        android:textSize="12sp"
+        android:textColor="#999999"
+        android:layout_marginTop="32dp" />
 
 </LinearLayout>

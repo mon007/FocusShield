@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   View,
+  Image,
 } from 'react-native';
 import { Colors } from '../theme/colors';
 
@@ -11,11 +12,13 @@ type Props = {
   name: string;
   showRemove?: boolean;
   onRemove?: () => void;
+  icon?: string;
 };
 
 export default function AppCard({
   name,
   showRemove = false,
+  icon,
   onRemove,
 }: Props) {
   return (
@@ -26,6 +29,17 @@ export default function AppCard({
 
       <View style={styles.row}>
         <View style={styles.leftSection}>
+           <Image
+    source={{
+      uri: `data:image/png;base64,${icon}`,
+    }}
+    style={{
+      width: 32,
+      height: 32,
+      borderRadius: 8,
+      marginRight: 12,
+    }}
+  />
           <Text style={styles.text}>
             {name}
           </Text>

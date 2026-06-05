@@ -11,6 +11,11 @@ import android.content.Intent
 import com.facebook.react.bridge.ReadableArray
 import android.provider.Settings
 import android.text.TextUtils
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.util.Base64
+import java.io.ByteArrayOutputStream
 
 class FocusBlockerModule(
     reactContext: ReactApplicationContext
@@ -20,6 +25,54 @@ class FocusBlockerModule(
         return "FocusBlocker"
     }
 
+private fun drawableToBase64(
+    drawable: android.graphics.drawable.Drawable
+): String {
+
+    val bitmap =
+        if (drawable is BitmapDrawable) {
+            drawable.bitmap
+        } else {
+
+            val bitmap =
+                Bitmap.createBitmap(
+                    drawable.intrinsicWidth,
+                    drawable.intrinsicHeight,
+                    Bitmap.Config.ARGB_8888
+                )
+
+            val canvas =
+                Canvas(bitmap)
+
+            drawable.setBounds(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            )
+
+            drawable.draw(canvas)
+
+            bitmap
+        }
+
+    val outputStream =
+        ByteArrayOutputStream()
+
+    bitmap.compress(
+        Bitmap.CompressFormat.PNG,
+        100,
+        outputStream
+    )
+
+    val bytes =
+        outputStream.toByteArray()
+
+    return Base64.encodeToString(
+        bytes,
+        Base64.NO_WRAP
+    )
+}
     @ReactMethod
     fun getDeviceName(promise: Promise) {
         try {
@@ -75,6 +128,15 @@ fun getInstalledApps(promise: Promise) {
                 "packageName",
                 app.activityInfo.packageName
             )
+            val icon =
+    app.loadIcon(
+        packageManager
+    )
+
+appMap.putString(
+    "icon",
+    drawableToBase64(icon)
+)
 
             result.pushMap(appMap)
         }

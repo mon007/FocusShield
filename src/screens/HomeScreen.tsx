@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   Alert,
   Modal,
-  TextInput
+  TextInput,
+  ActivityIndicator
 } from 'react-native';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -154,14 +155,14 @@ export default function HomeScreen({
     const endTime =
       Date.now() + duration * 60 * 1000;
 
-    await saveSession({
-      active: true,
-      endTime,
-      duration,
-
-      apps: selectedApps,
-      appNames: selectedAppNamesArray,
-    });
+ await saveSession({
+  active: true,
+  endTime,
+  duration,
+  apps: selectedApps,
+  appNames: selectedAppNamesArray,
+  blockedApps: apps,
+});
     await FocusBlocker.saveBlockedApps(
       selectedApps,
     );
@@ -299,8 +300,9 @@ export default function HomeScreen({
         <TouchableOpacity
           style={styles.addButton}
           onPress={async () => {
-            await loadAllApps();
             setModalVisible(true);
+            await loadAllApps();
+            
           }}>
           <Text style={styles.addButtonText}>
             + Add Apps
@@ -322,6 +324,7 @@ export default function HomeScreen({
         renderItem={({ item }) => (
           <AppCard
             name={item.name}
+            icon={item.icon}
             showRemove
             onRemove={() =>
               removeApp(
@@ -395,16 +398,16 @@ export default function HomeScreen({
             flex: 1,
             padding: 20,
             backgroundColor:
-              '#fff',
+              Colors.background,
           }}>
 
           <Text
             style={{
-              fontSize: 24,
+              fontSize: 18,
               fontWeight: '700',
-              marginBottom: 20,
+              marginVertical: 20,
             }}>
-            Add Apps
+            Add Apps to your focus list
           </Text>
 
           <TextInput
@@ -413,51 +416,59 @@ export default function HomeScreen({
               setSearch
             }
             placeholder="Search Apps"
+            placeholderTextColor={Colors.textSecondary}
             style={{
               borderWidth: 1,
               borderColor: '#ddd',
               borderRadius: 12,
               padding: 12,
               marginBottom: 20,
+              color: Colors.text
             }}
           />
 
-          <FlatList
-            data={allApps.filter(
-              app =>
-                app.name
-                  .toLowerCase()
-                  .includes(
-                    search.toLowerCase(),
-                  ),
-            )}
-            keyExtractor={item =>
-              item.packageName
-            }
-            renderItem={({
-              item,
-            }) => (
-              <TouchableOpacity
-                style={{
-                  padding: 16,
-                  borderBottomWidth: 1,
-                  borderBottomColor:
-                    '#eee',
-                }}
-                onPress={() =>
-                  toggleModalApp(
-                    item.packageName,
-                  )
-                }>
-                <Text>
-                  {item.selected
-                    ? '✓ '
-                    : ''}
-                  {item.name}
-                </Text>
-              </TouchableOpacity>
-            )}
-          />
+{allApps.length === 0 ? (
+  <ActivityIndicator
+    size="small"
+    style={{
+      marginVertical: 20,
+    }}
+  />
+) : (
+  <FlatList
+    data={allApps.filter(
+      app =>
+        app.name
+          .toLowerCase()
+          .includes(
+            search.toLowerCase(),
+          ),
+    )}
+    keyExtractor={item =>
+      item.packageName
+    }
+    renderItem={({item}) => (
+      <TouchableOpacity
+        style={{
+          padding: 16,
+          borderBottomWidth: 1,
+          borderBottomColor: '#eee',
+        }}
+        onPress={() =>
+          toggleModalApp(
+            item.packageName,
+          )
+        }>
+        <Text>
+          {item.selected
+            ? '✓ '
+            : ''}
+          {item.name}
+        </Text>
+      </TouchableOpacity>
+    )}
+  />
+)}
 
           <TouchableOpacity
             style={
@@ -517,6 +528,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
+    marginVertical:10
   },
 
   startButtonText: {
@@ -528,8 +540,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEF3C7',
     borderWidth: 1,
     borderColor: '#FCD34D',
-    padding:8,
-    marginVertical:10
+    padding: 8,
+    marginVertical: 10
   },
 
   warningText: {

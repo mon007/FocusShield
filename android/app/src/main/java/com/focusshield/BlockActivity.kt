@@ -36,8 +36,8 @@ class BlockActivity : AppCompatActivity() {
                 R.id.timerText
             )
 
-        blockTitle.text =
-            "$appName is blocked"
+       blockTitle.text =
+    "$appName is unavailable until your session ends."
 
         startTimer(timerText)
 
